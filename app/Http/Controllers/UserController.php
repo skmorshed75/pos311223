@@ -9,6 +9,8 @@ use App\Helper\JWTToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
+use function Psy\debug;
+
 class UserController extends Controller
 {
     function UserRegistration(Request $request){
@@ -83,6 +85,37 @@ class UserController extends Controller
                 'message' => 'unauthorised',
  
             ],200);
+        }
+    }
+
+    //VERIFY OTP AND EMAIL
+    function VerifyOTP(Request $request){  
+        $email = $request->input('email');
+        $otp = $request->input('otp');
+
+        $count = User::where('email','=',$email)
+        ->where('otp','=',$otp)
+        ->count();
+      
+        if($count == 1){
+            //Database Update
+            User::where('email','=',$email)->update(['otp'=>'0']);
+
+            //Password Reset Token Issue
+            $token = JWTToken::CreateTokenResetPassword($request->input('email'));
+            return response()->json([
+                "status"=>"success",
+                "message"=>"OTP Verification is successful",
+                'token' => $token
+            ],200);
+
+        } else {
+
+            return response()->json([
+                "status" => "failed",
+                "message" => "OTP Verification is failed"
+            ],200);
+
         }
     }
 }
