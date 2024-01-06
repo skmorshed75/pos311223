@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\TokenVerificationMiddleware;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,3 +23,6 @@ Route::post('/user-registration',[UserController::class,'UserRegistration']);
 Route::get('/user-login',[UserController::class,'UserLogin']);
 Route::get('/send-otp',[UserController::class,'SendOTPCode']);
 Route::get('/verify-otp',[UserController::class,'VerifyOtp']);
+
+//Token must verify before resetting password
+Route::get('/reset-password',[UserController::class, 'ResetPassword'])->middleware([TokenVerificationMiddleware::class]);
